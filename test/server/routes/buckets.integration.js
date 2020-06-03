@@ -8,7 +8,7 @@ const expect = require('chai').expect;
 const Config = require('../../..').Config;
 
 describe('BucketsRouter Integration', function() {
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
   afterEach(() => sandbox.restore());
 
   it('will give 400 error with bad object id', function(done) {
@@ -26,7 +26,7 @@ describe('BucketsRouter Integration', function() {
 
     const TestEngine = proxyquire('../../../lib/engine', {
       'storj-service-storage-models': MockStorage,
-      'storj-service-mailer': MockMailer,
+      'storx-service-mailer': MockMailer,
       'storj-complex': MockComplex,
       'storj-mongodb-adapter': MockMongoAdapter
     });

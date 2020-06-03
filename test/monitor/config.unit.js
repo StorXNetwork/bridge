@@ -7,7 +7,7 @@ const MonitorConfig = require('../../lib/monitor/config');
 
 describe('Monitor Config', function() {
 
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
   let readFileSync;
   let writeFileSync;
   let mkdirSync;
@@ -118,7 +118,7 @@ describe('Monitor Config', function() {
 
     const DEFAULTS = {
       storage: {
-        mongoUrl: 'mongodb://127.0.0.1:27017/__storj-bridge-test',
+        mongoUrl: 'mongodb://mongodbserver:27017/__storj-bridge-test',
         mongoOpts: {}
       },
       complex: {

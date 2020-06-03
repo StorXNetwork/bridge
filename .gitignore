@@ -36,3 +36,4 @@ playbook.retry
 
 # Vagrant dotfiles
 .vagrant
+.env

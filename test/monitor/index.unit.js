@@ -15,7 +15,7 @@ const log = require('../../lib/logger');
 
 describe('Monitor', function() {
 
-  const sandbox = sinon.sandbox.create();
+  const sandbox = sinon.createSandbox();
   beforeEach(() => {
     sandbox.stub(fs, 'existsSync').returns(true);
     sandbox.stub(fs, 'writeFileSync');
@@ -101,7 +101,9 @@ describe('Monitor', function() {
   });
 
   describe('#_fetchDestinations', function() {
+    // TODO: Update fetch destination unit tests
     it('it will filter and sort mirrors', function(done) {
+      this.timeout(30000);
       sandbox.spy(Monitor, 'sortByTimeoutRate');
       const monitor = new Monitor(config);
       const results = [
@@ -109,26 +111,30 @@ describe('Monitor', function() {
         {
           contact: {
             _id: '3cc349ea3b302fb953b4dde04f99af23fe4a849b',
-            timeoutRate: 0.001
+            timeoutRate: 0.001,
+            address: 'a.storx.io'
           },
           isEstablished: false
         },
         {
           contact: {
             _id: '8e744f9ece61fbfc6a22061678f66eea76d67690',
-            timeoutRate: 0.01
+            timeoutRate: 0.01,
+            address: 'a.storx.io'
           },
           isEstablished: false
         },
         {
           contact: {
-            _id: '1d66d28271270ee56d5914d9282756b3968592ee'
+            _id: '1d66d28271270ee56d5914d9282756b3968592ee',
+            address: 'b.storx.io'
           },
           isEstablished: true
         },
         {
           contact: {
-            _id: '1f22ab4bddee4f7ba918277b346cf20df3592b4b'
+            _id: '1f22ab4bddee4f7ba918277b346cf20df3592b4b',
+            address: 'b.storx.io'
           },
           isEstablished: false
         }
@@ -140,6 +146,9 @@ describe('Monitor', function() {
         models: {
           Mirror: {
             find: find
+          },
+          Contact: {
+            find: find
           }
         }
       };
@@ -150,6 +159,7 @@ describe('Monitor', function() {
         }
       };
       monitor._fetchDestinations(shard, (err, mirrors) => {
+        console.log('-fetchDestinations results');
         if (err) {
           return done(err);
         }
@@ -172,6 +182,9 @@ describe('Monitor', function() {
       monitor.storage = {
         models: {
           Mirror: {
+            find: find
+          },
+          Contact: {
             find: find
           }
         }
@@ -349,7 +362,7 @@ describe('Monitor', function() {
   });
 
   describe('#_transferShard', function() {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
 
     it('will handle an invalid contract', function(done) {
@@ -520,7 +533,7 @@ describe('Monitor', function() {
   });
 
   describe('#_replicateShard', function() {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
 
     it('it will fetch sources and destinations', function(done) {
@@ -564,7 +577,7 @@ describe('Monitor', function() {
   });
 
   describe('#_replicateFarmer', function() {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
 
     it('it will log on error', function(done) {
@@ -607,6 +620,9 @@ describe('Monitor', function() {
           Shard: {
             find: sandbox.stub().returns({
               cursor: sandbox.stub().returns(cursor)
+            }),
+            update: sandbox.stub().returns({
+              
             })
           }
         }
@@ -691,7 +707,11 @@ describe('Monitor', function() {
           Shard: {
             find: sandbox.stub().returns({
               cursor: sandbox.stub().returns(cursor)
-            })
+            }),
+            update: () => {}
+          },
+          Mirror: {
+            deleteMany: () => {}
           }
         }
       };
@@ -839,6 +859,9 @@ describe('Monitor', function() {
         models: {
           Contact: {
             find: find
+          },
+          User: {
+
           }
         }
       };
@@ -881,7 +904,7 @@ describe('Monitor', function() {
       expect(recordTimeoutFailure.callCount).to.equal(2);
       expect(save.callCount).to.equal(2);
 
-      expect(log.info.callCount).to.equal(2);
+      expect(log.info.callCount).to.equal(3);
       expect(log.warn.callCount).to.equal(1);
       expect(log.warn.args[0][1])
         .to.equal('7b8b30132e930c7827ee47efebfb197d6a3246d4');
